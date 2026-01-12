@@ -23,7 +23,6 @@ void addstudent(){
     scanf(" %s", s.id);
 
     getchar();
-
     printf("Enter name: ");
     fgets(s.name,sizeof(s.name),stdin);
 
