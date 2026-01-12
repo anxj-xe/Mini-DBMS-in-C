@@ -71,7 +71,7 @@ void searchstudents(){
         return;
     }
 
-    printf("Enter student's Enrollment Number: ");\
+    printf("Enter student's Enrollment Number: ");
     scanf("%99s", key);
 
     while(fread(&s,sizeof(s),1,fp)){
@@ -311,44 +311,48 @@ void deletestudents(){
 int main(){
 
     int choice;
+    int exit = 0;
 
-    printf("******************************\n");
-    printf("     STUDENT MINI DBMS        \n");
-    printf("******************************\n\n");
+    while(!exit){
+        printf("******************************\n");
+        printf("     STUDENT MINI DBMS        \n");
+        printf("******************************\n\n");
 
-    printf("1. Add Student\n");
-    printf("2. View all Students\n");
-    printf("3. Search by student ID\n");
-    printf("4. Update Student profile\n");
-    printf("5. Delete Student\n");
-    printf("6. Exit\n\n");
+        printf("1. Add Student\n");
+        printf("2. View all Students\n");
+        printf("3. Search by student ID\n");
+        printf("4. Update Student profile\n");
+        printf("5. Delete Student\n");
+        printf("6. Exit\n\n");
 
-    printf("Enter number to choose: ");
-    scanf("%d",&choice);
+        printf("Enter number to choose: ");
+        scanf("%d",&choice);
 
-    printf("\nYou selected option %d.\n\n", choice);
+        printf("\nYou selected option %d.\n\n", choice);
 
-    switch(choice){
-        case 1:
-            addstudent();
-            break;
-        case 2:
-            viewstudents();
-            break;
-        case 3:
-            searchstudents();
-            break;
-        case 4:
-            updatestudents();
-            break;
-        case 5:
-            deletestudents();
-            break;
-        case 6:
-            printf("Programme closed!");
-            break;
-        default:
-            printf("\nInvalid Input!!\n");
+        switch(choice){
+            case 1:
+                addstudent();
+                break;
+            case 2:
+                viewstudents();
+                break;
+            case 3:
+                searchstudents();
+                break;
+            case 4:
+                updatestudents();
+                break;
+            case 5:
+                deletestudents();
+                break;
+            case 6:
+                printf("Programe closed!");
+                exit = 1;
+                break;
+            default:
+                printf("\nInvalid Input!!\n");
+        }
     }
 
     return 0;
