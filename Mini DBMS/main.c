@@ -19,23 +19,32 @@ void addstudent(){
         return;
     }
 
-    printf("Enter Enrollment Number: ");
-    scanf(" %s", s.id);
+    int howmany;
+    printf("How many student you want to add?: ");
+    scanf("%d",&howmany);
 
-    getchar();
-    printf("Enter name: ");
-    fgets(s.name,sizeof(s.name),stdin);
+    for(int i=0;i<howmany;i++){
+        printf("\nEnter details of student no. %d: \n", (i+1));
 
-    printf("Enter age: ");
-    scanf("%d", &s.age);
+        printf("Enter Enrollment Number: ");
+        scanf(" %s", s.id);
 
-    printf("Enter CGPA: ");
-    scanf("%f", &s.CGPA);
+        getchar();
+        printf("Enter name: ");
+        fgets(s.name,sizeof(s.name),stdin);
 
-    fwrite(&s,sizeof(s),1,fp);
+        printf("Enter age: ");
+        scanf("%d", &s.age);
+
+        printf("Enter CGPA: ");
+        scanf("%f", &s.CGPA);
+
+        fwrite(&s,sizeof(s),1,fp);
+    }
+
     fclose(fp);
 
-    printf("Student added successfully!");
+    printf("\nStudent added successfully!\n");
 }
 
 void viewstudents(){
@@ -267,38 +276,44 @@ void deletestudents(){
     int found = 0;
     char key[100];
 
-    printf("Enter Enrollment Number to delete: ");
-    scanf(" %99s", key);
-
     FILE *fp, *temp;
 
-    fp = fopen("student.dat", "rb");
-    temp = fopen("temp.dat", "wb");  
-
-    if(fp == NULL || temp == NULL){
-        printf("Invalid file!");
-        return;
-    }
-    while(fread(&s,sizeof(s),1,fp)){
-        if(strcmp(s.id,key)==0){
-            found = 1;
-
-            printf("\n***STUDENT FOUND***\n\n");
-            printf("Enrollment number: %s\n",s.id);
-            printf("Name: %s",s.name);
-            printf("Age: %d\n",s.age);
-            printf("CGPA: %.2f\n\n", s.CGPA);
-
-            continue;
+    
+    int howmany;
+    printf("How many student you want to delete?: ");
+    scanf("%d",&howmany);
+    
+    for(int i=0;i<howmany;i++){
+        
+        fp = fopen("student.dat", "rb");
+        temp = fopen("temp.dat", "wb");  
+    
+        if(fp == NULL || temp == NULL){
+            printf("Invalid file!");
+            return;
         }
-        fwrite(&s,sizeof(s),1,temp);
+        printf("Enter Enrollment Number to delete: ");
+        scanf(" %99s", key);
+
+        while(fread(&s,sizeof(s),1,fp)){
+            if(strcmp(s.id,key)==0){
+                found = 1;
+
+                printf("\n***STUDENT FOUND***\n\n");
+                printf("Enrollment number: %s\n",s.id);
+                printf("Name: %s",s.name);
+                printf("Age: %d\n",s.age);
+                printf("CGPA: %.2f\n\n", s.CGPA);
+
+                continue;
+            }
+            fwrite(&s,sizeof(s),1,temp);
+        }
+        fclose(fp);
+        fclose(temp);  
+        remove("student.dat");
+        rename("temp.dat","student.dat");
     }
-    fclose(fp);
-    fclose(temp);
-
-    remove("student.dat");
-    rename("temp.dat","student.dat");
-
     if(found){
         printf("\nStudent removed succesfully!\n");
     }
