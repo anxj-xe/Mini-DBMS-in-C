@@ -11,6 +11,7 @@ struct Student{
 void addstudent(){
     struct Student s;
     FILE *fp;
+    int howmany;
 
     fp = fopen("student.dat", "ab");
 
@@ -19,17 +20,17 @@ void addstudent(){
         return;
     }
 
-    int howmany;
-    printf("How many student you want to add?: ");
-    scanf("%d",&howmany);
+    printf("How many Studets are being added?: ");
+    scanf("%d", &howmany);
 
     for(int i=0;i<howmany;i++){
-        printf("\nEnter details of student no. %d: \n", (i+1));
+        printf("Enter details of student %d: ",i+1);
 
-        printf("Enter Enrollment Number: ");
+        printf("\n\nEnter id: ");
         scanf(" %s", s.id);
 
         getchar();
+
         printf("Enter name: ");
         fgets(s.name,sizeof(s.name),stdin);
 
@@ -41,10 +42,9 @@ void addstudent(){
 
         fwrite(&s,sizeof(s),1,fp);
     }
-
     fclose(fp);
 
-    printf("\nStudent added successfully!\n");
+    printf("Student added successfully!\n\n");
 }
 
 void viewstudents(){
@@ -64,6 +64,7 @@ void viewstudents(){
         printf("Age: %d\n",s.age);
         printf("CGPA: %.2f\n\n", s.CGPA);
     }
+    fclose(fp);
 }
 
 void searchstudents(){
@@ -79,7 +80,7 @@ void searchstudents(){
         return;
     }
 
-    printf("Enter student's Enrollment Number: ");
+    printf("Enter student's Enrollment Number: ");\
     scanf("%99s", key);
 
     while(fread(&s,sizeof(s),1,fp)){
@@ -94,8 +95,9 @@ void searchstudents(){
             found = 1;
             break;
         }
-
     }
+    fclose(fp);
+
     if(!found){
         printf("\n**Student not found or Invalid Enrollment number!**\n");
     }
@@ -276,56 +278,50 @@ void deletestudents(){
     int found = 0;
     char key[100];
 
+    printf("Enter Enrollment Number to delete: ");
+    scanf(" %99s", key);
+
     FILE *fp, *temp;
 
-    
-    int howmany;
-    printf("How many student you want to delete?: ");
-    scanf("%d",&howmany);
-    
-    for(int i=0;i<howmany;i++){
-        
-        fp = fopen("student.dat", "rb");
-        temp = fopen("temp.dat", "wb");  
-    
-        if(fp == NULL || temp == NULL){
-            printf("Invalid file!");
-            return;
-        }
-        printf("Enter Enrollment Number to delete: ");
-        scanf(" %99s", key);
+    fp = fopen("student.dat", "rb");
+    temp = fopen("temp.dat", "wb");  
 
-        while(fread(&s,sizeof(s),1,fp)){
-            if(strcmp(s.id,key)==0){
-                found = 1;
-
-                printf("\n***STUDENT FOUND***\n\n");
-                printf("Enrollment number: %s\n",s.id);
-                printf("Name: %s",s.name);
-                printf("Age: %d\n",s.age);
-                printf("CGPA: %.2f\n\n", s.CGPA);
-
-                continue;
-            }
-            fwrite(&s,sizeof(s),1,temp);
-        }
-        fclose(fp);
-        fclose(temp);  
-        remove("student.dat");
-        rename("temp.dat","student.dat");
+    if(fp == NULL || temp == NULL){
+        printf("Invalid file!");
+        return;
     }
+    while(fread(&s,sizeof(s),1,fp)){
+        if(strcmp(s.id,key)==0){
+            found = 1;
+
+            printf("\n***STUDENT FOUND***\n\n");
+            printf("Enrollment number: %s\n",s.id);
+            printf("Name: %s",s.name);
+            printf("Age: %d\n",s.age);
+            printf("CGPA: %.2f\n\n", s.CGPA);
+
+            continue;
+        }
+        fwrite(&s,sizeof(s),1,temp);
+    }
+    fclose(fp);
+    fclose(temp);
+
+    remove("student.dat");
+    rename("temp.dat","student.dat");
+
     if(found){
         printf("\nStudent removed succesfully!\n");
     }
     else{
-        printf("\nStudent not removed!");
+        printf("\nStudent not found to delete!");
     }
 }
 
 int main(){
 
     int choice;
-    int exit = 0;
+    int exit=0;
 
     while(!exit){
         printf("******************************\n");
@@ -361,7 +357,7 @@ int main(){
                 deletestudents();
                 break;
             case 6:
-                printf("Programe closed!");
+                printf("Programe Cloed! Thank you!!");
                 exit = 1;
                 break;
             default:
