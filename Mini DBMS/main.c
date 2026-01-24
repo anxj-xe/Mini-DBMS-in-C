@@ -8,34 +8,59 @@ struct Student{
     float CGPA;
 };
 
-void addstudent(){
+void searchid(char* key){
     struct Student s;
-    FILE *fp;
-
-    fp = fopen("student.dat", "ab");
-
+    FILE *fp = fopen("student.dat", "rb");
     if(fp == NULL){
-        printf("File error\n");
+        printf("Cannot open File\n");
         return;
     }
+    int found = 0;
 
-    printf("Enter Enrollment Number: ");
-    scanf(" %s", s.id);
+    while(fread(&s,sizeof(s),1,fp)){
+        if(strcmp(key,s.id)==0){
+            printf("Student with this Enrollment number already exist!\n\n");
+            found = 1;
+            break;
+        }
+        fclose(fp);
+    }
 
-    getchar();
-    printf("Enter name: ");
-    fgets(s.name,sizeof(s.name),stdin);
+    if(found!=1){
+        struct Student s;
+        FILE *fp;
+        fp = fopen("student.dat", "ab");
 
-    printf("Enter age: ");
-    scanf("%d", &s.age);
+        if(fp == NULL){
+            printf("File error\n");
+            return;
+        }
+        strcpy(s.id,key);
 
-    printf("Enter CGPA: ");
-    scanf("%f", &s.CGPA);
+        getchar();
+        printf("Enter name: ");
+        fgets(s.name,sizeof(s.name),stdin);
 
-    fwrite(&s,sizeof(s),1,fp);
+        printf("Enter age: ");
+        scanf("%d", &s.age);
+
+        printf("Enter CGPA: ");
+        scanf("%f", &s.CGPA);
+
+        printf("Student added successfully!\n");
+
+        fwrite(&s,sizeof(s),1,fp);
+    }
     fclose(fp);
+}
 
-    printf("Student added successfully!");
+void addstudent(){
+    char key[50];
+    printf("Enter student's Enrollment Number: ");
+    scanf("%99s", key);
+    printf("\n");
+
+    searchid(key);
 }
 
 void viewstudents(){
@@ -172,96 +197,6 @@ void updatestudents(){
     }
 }
 
-// ALL THIS BULLSHIT WAS ME TRYING THE FUHH OUTTA ME (IT IS HERE FOR FUTURE REFFERENCE WHAT I DID WRONG!!)
-
-// void updatestudents(){
-//     struct Student s;
-//     char key[100];
-//     int found = 0;
-
-//     FILE *fp;
-//     fp = fopen("student.dat", "rb");
-
-//     if(fp==NULL){
-//         printf("File error!");
-//         return;
-//     }
-
-//     printf("Enter student's Enrollment Number: ");
-//     scanf("%99s", key);
-
-//     while(fread(&s,sizeof(s),1,fp)){
-//         if(strcmp(s.id,key) == 0){
-//             int updatenum;
-
-//             printf("Choose what to update:\n");
-
-//             printf("1. Enrollment Number\n");
-//             printf("2. Name\n");
-//             printf("3. Age\n");
-//             printf("4. Grade(CGPA)\n");
-
-//             printf("Enter a number to choose: ");
-//             scanf("%d", &updatenum);
-
-//             char newid[100];
-//             switch(updatenum){
-//                 case 1:
-//                     printf("Enter updated Enrollment Number: ");
-//                     scanf("%99s",newid);
-//                     strcpy(s.id,newid);
-//                     printf("Enollment number updated!\n\n");
-//                     break;
-//                 default:
-//                     printf("No update or Invalid update was done.");
-//             }
-//             FILE *fp;
-//             fp = fopen("student.dat", "ab");
-//             if(fp == NULL) printf("File error!");
-//             fwrite(&s,sizeof(s),1,fp);
-//             fclose(fp);
-//                     printf("\n***UPDATED INFO***\n\n");
-//                     printf("Enrollment number: %s\n",s.id);
-//                     printf("Name: %s",s.name);
-//                     printf("Age: %d\n",s.age);
-//                     printf("CGPA: %.2f\n\n", s.CGPA);
-//         }
-//     }
-// }
-
-
-// void updatestudents(){
-//     struct Student s;
-//     int updatenum;
-
-//     searchstudents()
-
-//     printf("Choose what to update:\n");
-
-//     printf("1. Enrollment Number\n");
-//     printf("2. Name\n");
-//     printf("3. Age\n");
-//     printf("4. Grade(CGPA)\n");
-
-//     printf("Enter a number to choose: ");
-//     scanf("%d", &updatenum);
-
-//     char newid[100];
-//     switch(updatenum){
-//         case 1:
-//             printf("Enter updated Enrollment Number: ");
-//             scanf("%s",&newid);
-//             strcpy(s.id,newid);
-//             break;
-//         default:
-//             printf("No update or Invalid update was done.");
-//     }
-//             printf("Enrollment number: %s\n",s.id);
-//             printf("Name: %s",s.name);
-//             printf("Age: %d\n",s.age);
-//             printf("CGPA: %.2f\n\n", s.CGPA);
-// }
-
 void deletestudents(){
     struct Student s;
     int found = 0;
@@ -332,6 +267,7 @@ int main(){
         switch(choice){
             case 1:
                 addstudent();
+                exit = 1;
                 break;
             case 2:
                 viewstudents();
