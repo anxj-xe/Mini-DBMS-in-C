@@ -23,8 +23,8 @@ void searchid(char* key){
             found = 1;
             break;
         }
-        fclose(fp);
     }
+    fclose(fp);
 
     if(found!=1){
         struct Student s;
