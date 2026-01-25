@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<io.h>
 
 struct Student{
     char id[100];
@@ -11,7 +12,7 @@ struct Student{
 int searchid(char* key,int k){
     struct Student s;
     FILE *fp;
-    fp = fopen("student.dat", "rb");
+    (access("student.dat",F_OK)==0) ? (fp = fopen("student.dat","rb")) : (fp = fopen("student.dat", "wb"));
     if(fp == NULL){
         printf("Cannot open File\n");
         return 1;
