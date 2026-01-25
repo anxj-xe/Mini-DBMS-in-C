@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<string.h>
-#include<errno.h>
 
 struct Student{
     char id[100];
@@ -11,7 +10,12 @@ struct Student{
 
 void searchid(char* key){
     struct Student s;
-    FILE *fp = fopen("student.dat", "ab");
+    FILE *fp;
+    if(("student.dat")==0){
+        fp = fopen("student.dat", "rb");
+    }else{
+        fp = fopen("student.dat", "ab");
+    }
     if(fp == NULL){
         printf("Cannot open File\n");
         return;
@@ -187,8 +191,22 @@ void updatestudents(){
     fclose(fp);
     fclose(temp);
 
-    remove("student.dat");
-    rename("temp.dat","student.dat");
+    fp = fopen("student.dat","wb");
+    temp = fopen("temp.dat","rb");
+
+    if(fp==NULL || temp==NULL){
+        printf("fp or temp file error in update student!\n");
+        return;
+    }
+
+    while(fread(&s,sizeof(s),1,temp)){
+        fwrite(&s,sizeof(s),1,fp);
+    }
+
+    fclose(temp);
+    fclose(fp);
+
+    remove("temp.dat");
 
     if(found){
         printf("\nStudent data updated succesfully!\n");
@@ -253,28 +271,6 @@ void deletestudents(){
     fclose(fp);
 
     remove("temp.dat");
-
-    // temp = fopen("temp.dat", "rb");
-    // if(temp=NULL){
-    //     printf("ERROR: temp.dat was not created\n");
-    //     return;
-    // }
-    // fclose(temp);
-
-    // remove("student.dat");
-    // rename("temp.dat","student.dat");
-
-    // if(remove("student.dat")!=0){
-    //     printf("\"student.dat\" is not removed!\n");
-    //     perror("remove");
-    //     return;
-    // }
-    // if(rename("temp.dat","student.dat")!=0){
-    //     printf("\"rename\" is not sucessfull!\n");
-    //     printf("Error code: %d\n", errno);
-    //     perror("rename");
-    //     return;
-    // }
 
     if(found){
         printf("\nStudent removed succesfully!\n");
