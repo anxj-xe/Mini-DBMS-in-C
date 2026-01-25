@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<errno.h>
 
 struct Student{
     char id[100];
@@ -10,7 +11,7 @@ struct Student{
 
 void searchid(char* key){
     struct Student s;
-    FILE *fp = fopen("student.dat", "rb");
+    FILE *fp = fopen("student.dat", "ab");
     if(fp == NULL){
         printf("Cannot open File\n");
         return;
@@ -25,11 +26,11 @@ void searchid(char* key){
         }
     }
     fclose(fp);
-
+    
     if(found!=1){
         struct Student s;
-        FILE *fp;
-        fp = fopen("student.dat", "ab");
+        FILE *fp_write;
+        fp_write = fopen("student.dat", "ab");
 
         if(fp == NULL){
             printf("File error\n");
@@ -47,11 +48,11 @@ void searchid(char* key){
         printf("Enter CGPA: ");
         scanf("%f", &s.CGPA);
 
+        fwrite(&s,sizeof(s),1,fp_write);
+        fclose(fp_write);
         printf("Student added successfully!\n");
 
-        fwrite(&s,sizeof(s),1,fp);
     }
-    fclose(fp);
 }
 
 void addstudent(){
@@ -131,7 +132,7 @@ void updatestudents(){
     temp = fopen("temp.dat", "wb");  
 
     if(fp == NULL || temp == NULL){
-        printf("Invalid file!");
+        printf("Invalid file!\n");
         return;
     }
     while(fread(&s,sizeof(s),1,fp)){
@@ -208,12 +209,17 @@ void deletestudents(){
     FILE *fp, *temp;
 
     fp = fopen("student.dat", "rb");
-    temp = fopen("temp.dat", "wb");  
-
-    if(fp == NULL || temp == NULL){
-        printf("Invalid file!");
+    if(fp==NULL){
+        printf("Cannot open fp in deleteStudent!");
         return;
     }
+    temp = fopen("temp.dat", "wb");
+    if(temp==NULL){
+        fclose(fp);
+        printf("cannot open temp in deleteStudent!");
+        return;
+    }
+
     while(fread(&s,sizeof(s),1,fp)){
         if(strcmp(s.id,key)==0){
             found = 1;
@@ -231,14 +237,50 @@ void deletestudents(){
     fclose(fp);
     fclose(temp);
 
-    remove("student.dat");
-    rename("temp.dat","student.dat");
+    fp = fopen("student.dat","wb");
+    temp = fopen("temp.dat", "rb");
+
+    if(fp==NULL || temp==NULL){
+        printf("fp or temp file error in double copying!\n");
+        return;
+    }
+
+    while(fread(&s,sizeof(s),1,temp)){
+        fwrite(&s,sizeof(s),1,fp);
+    }
+
+    fclose(temp);
+    fclose(fp);
+
+    remove("temp.dat");
+
+    // temp = fopen("temp.dat", "rb");
+    // if(temp=NULL){
+    //     printf("ERROR: temp.dat was not created\n");
+    //     return;
+    // }
+    // fclose(temp);
+
+    // remove("student.dat");
+    // rename("temp.dat","student.dat");
+
+    // if(remove("student.dat")!=0){
+    //     printf("\"student.dat\" is not removed!\n");
+    //     perror("remove");
+    //     return;
+    // }
+    // if(rename("temp.dat","student.dat")!=0){
+    //     printf("\"rename\" is not sucessfull!\n");
+    //     printf("Error code: %d\n", errno);
+    //     perror("rename");
+    //     return;
+    // }
 
     if(found){
         printf("\nStudent removed succesfully!\n");
     }
     else{
-        printf("\nStudent not removed!");
+        printf("\nStudent not removed!\n");
     }
 }
 
@@ -267,7 +309,6 @@ int main(){
         switch(choice){
             case 1:
                 addstudent();
-                exit = 1;
                 break;
             case 2:
                 viewstudents();
