@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<string.h>
-#include<errno.h>
 
 struct Student{
     char id[100];
@@ -9,24 +8,29 @@ struct Student{
     float CGPA;
 };
 
-void searchid(char* key){
+int searchid(char* key,int k){
     struct Student s;
-    FILE *fp = fopen("student.dat", "ab");
+    FILE *fp;
+    fp = fopen("student.dat", "rb");
     if(fp == NULL){
         printf("Cannot open File\n");
-        return;
+        return 1;
     }
     int found = 0;
 
     while(fread(&s,sizeof(s),1,fp)){
         if(strcmp(key,s.id)==0){
-            printf("Student with this Enrollment number already exist!\n\n");
+            printf("\n**Enrollment number already exists!**\n");
             found = 1;
             break;
         }
     }
     fclose(fp);
-    
+
+    if(k==1){
+        return found;
+    }
+
     if(found!=1){
         struct Student s;
         FILE *fp_write;
@@ -34,7 +38,7 @@ void searchid(char* key){
 
         if(fp == NULL){
             printf("File error\n");
-            return;
+            return 1;
         }
         strcpy(s.id,key);
 
@@ -61,7 +65,7 @@ void addstudent(){
     scanf("%99s", key);
     printf("\n");
 
-    searchid(key);
+    searchid(key,0);
 }
 
 void viewstudents(){
@@ -162,7 +166,10 @@ void updatestudents(){
                 case 1:
                     printf("\nEnter updated Enrollment Number: ");
                     scanf("%99s",newid);
-                    strcpy(s.id,newid);
+                    if (searchid(newid,1)==0){
+                        strcpy(s.id,newid);
+                        printf("\nEnrollment Number updated successfully!\n");
+                    }
                     break;
                 case 2:
                     printf("\nEnter updated name: ");
@@ -181,21 +188,35 @@ void updatestudents(){
                 default:
                     printf("No update or Invalid update was done.\n");
             }
+            if(found==1 && updatenum!=1){
+                printf("\nStudent data updated succesfully!\n");
+            }
+            else if(found==0 && updatenum!=1){
+                printf("\nStudent updation error!!\n");
+            }
         }
         fwrite(&s,sizeof(s),1,temp);
     }
     fclose(fp);
     fclose(temp);
 
-    remove("student.dat");
-    rename("temp.dat","student.dat");
+    fp = fopen("student.dat","wb");
+    temp = fopen("temp.dat","rb");
 
-    if(found){
-        printf("\nStudent data updated succesfully!\n");
+    if(fp==NULL || temp==NULL){
+        printf("fp or temp file error in update student!\n");
+        return;
     }
-    else{
-        printf("\nStudent updation error!!");
+
+    while(fread(&s,sizeof(s),1,temp)){
+        fwrite(&s,sizeof(s),1,fp);
     }
+
+    fclose(temp);
+    fclose(fp);
+
+    remove("temp.dat");
+
 }
 
 void deletestudents(){
@@ -253,28 +274,6 @@ void deletestudents(){
     fclose(fp);
 
     remove("temp.dat");
-
-    // temp = fopen("temp.dat", "rb");
-    // if(temp=NULL){
-    //     printf("ERROR: temp.dat was not created\n");
-    //     return;
-    // }
-    // fclose(temp);
-
-    // remove("student.dat");
-    // rename("temp.dat","student.dat");
-
-    // if(remove("student.dat")!=0){
-    //     printf("\"student.dat\" is not removed!\n");
-    //     perror("remove");
-    //     return;
-    // }
-    // if(rename("temp.dat","student.dat")!=0){
-    //     printf("\"rename\" is not sucessfull!\n");
-    //     printf("Error code: %d\n", errno);
-    //     perror("rename");
-    //     return;
-    // }
 
     if(found){
         printf("\nStudent removed succesfully!\n");
